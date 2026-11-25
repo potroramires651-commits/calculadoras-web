@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadoras, Conversor de Monedas y Unidades Gratis</title>
+  <meta name="description" content="Convierte monedas en vivo, calcula porcentajes, descuentos, ganancias y cambia unidades (km/millas, kg/libras, °C/°F) gratis al instante." />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans p-4 md:p-8">
+  <div class="max-w-3xl mx-auto space-y-6">
+    <header class="text-center space-y-2">
+      <h1 class="text-2xl md:text-3xl font-bold text-cyan-400">Calculadoras y Conversores Rápidos</h1>
+      <p class="text-sm text-slate-400">Herramientas reales y gratuitas para tus cuentas diarias</p>
+    </header>
+
+    <!-- Selector de herramienta -->
+    <nav class="grid grid-cols-2 md:grid-cols-4 gap-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800">
+      <button onclick="showTab('moneda')" id="tab-moneda" class="tab-btn bg-cyan-500 text-slate-950 font-bold py-2 rounded-lg text-sm">Monedas</button>
+      <button onclick="showTab('porcentaje')" id="tab-porcentaje" class="tab-btn text-slate-300 font-semibold py-2 rounded-lg text-sm">Porcentajes</button>
+      <button onclick="showTab('ganancia')" id="tab-ganancia" class="tab-btn text-slate-300 font-semibold py-2 rounded-lg text-sm">Descuento / Ganancia</button>
+      <button onclick="showTab('unidades')" id="tab-unidades" class="tab-btn text-slate-300 font-semibold py-2 rounded-lg text-sm">Unidades</button>
+    </nav>
+
+    <!-- 1. CONVERSOR DE MONEDAS EN TIEMPO REAL -->
+    <section id="sec-moneda" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+      <h2 class="text-lg font-bold text-emerald-400">Conversor de Divisas en Vivo</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+          <label class="text-xs text-slate-400">Monto</label>
+          <input type="number" id="amount" value="100" oninput="convertCurrency()" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-lg p-3 text-lg font-bold" />
+        </div>
+        <div>
+          <label class="text-xs text-slate-400">De</label>
+          <select id="fromCurr" onchange="convertCurrency()" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-lg p-3">
+            <option value="USD" selected>USD - Dólar EE.UU.</option>
+            <option value="DOP">DOP - Peso Dominicano</option>
+            <option value="EUR">EUR - Euro</option>
+            <option value="MXN">MXN - Peso Mexicano</option>
+            <option value="COP">COP - Peso Colombiano</option>
+            <option value="ARS">ARS - Peso Argentino</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-slate-400">A</label>
+          <select id="toCurr" onchange="convertCurrency()" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-lg p-3">
+            <option value="DOP" selected>DOP - Peso Dominicano</option>
+            <option value="USD">USD - Dólar EE.UU.</option>
+            <option value="EUR">EUR - Euro</option>
+            <option value="MXN">MXN - Peso Mexicano</option>
+            <option value="COP">COP - Peso Colombiano</option>
+            <option value="ARS">ARS - Peso Argentino</option>
+          </select>
+        </div>
+      </div>
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-center">
+        <p id="currResult" class="text-2xl font-extrabold text-cyan-400">Cargando tasa real...</p>
+        <p id="currRateInfo" class="text-xs text-slate-500 mt-1"></p>
+      </div>
+    </section>
+
+    <!-- 2. CALCULADORA DE PORCENTAJES -->
+    <section id="sec-porcentaje" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+      <h2 class="text-lg font-bold text-amber-400">Calculadora de Porcentajes</h2>
+      <div class="flex flex-wrap items-center gap-3">
+        <span>¿Cuánto es el</span>
+        <input type="number" id="pctValue" value="15" oninput="calcPct()" class="w-24 bg-slate-950 border border-slate-700 rounded-lg p-2 text-center font-bold" />
+        <span>% de</span>
+        <input type="number" id="pctTotal" value="2000" oninput="calcPct()" class="w-32 bg-slate-950 border border-slate-700 rounded-lg p-2 text-center font-bold" />
+        <span>?</span>
+      </div>
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-center">
+        <p id="pctResult" class="text-2xl font-extrabold text-amber-400">300</p>
+      </div>
+    </section>
+
+    <!-- 3. DESCUENTOS Y MARGEN DE GANANCIA -->
+    <section id="sec-ganancia" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+      <h2 class="text-lg font-bold text-purple-400">Calculadora de Descuentos y Ganancias</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs text-slate-400">Precio o Costo Base</label>
+          <input type="number" id="basePrice" value="1000" oninput="calcMargin()" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-lg p-3 font-bold" />
+        </div>
+        <div>
+          <label class="text-xs text-slate-400">Porcentaje (%)</label>
+          <input type="number" id="marginPct" value="20" oninput="calcMargin()" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-lg p-3 font-bold" />
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-center">
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+          <p class="text-xs text-slate-400">Con Descuento (-%)</p>
+          <p id="discountOut" class="text-xl font-bold text-emerald-400 mt-1">800.00</p>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+          <p class="text-xs text-slate-400">Con Ganancia / Impuesto (+%)</p>
+          <p id="profitOut" class="text-xl font-bold text-purple-400 mt-1">1,200.00</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. CONVERSOR DE UNIDADES -->
+    <section id="sec-unidades" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+      <h2 class="text-lg font-bold text-sky-400">Conversor de Unidades</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+          <label class="text-xs text-slate-400">Valor</label>
+          <input type="number" id="unitVal" value="10" oninput="convertUnit()" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-lg p-3 text-lg font-bold" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="text-xs text-slate-400">Tipo de conversión</label>
+          <select id="unitMode" onchange="convertUnit()" class="w-full mt-1 bg-slate-950 border border-slate-700 rounded-lg p-3">
+            <option value="km_mi">Kilómetros (km) → Millas (mi)</option>
+            <option value="mi_km">Millas (mi) → Kilómetros (km)</option>
+            <option value="kg_lb">Kilogramos (kg) → Libras (lb)</option>
+            <option value="lb_kg">Libras (lb) → Kilogramos (kg)</option>
+            <option value="c_f">Celsius (°C) → Fahrenheit (°F)</option>
+            <option value="f_c">Fahrenheit (°F) → Celsius (°C)</option>
+          </select>
+        </div>
+      </div>
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-center">
+        <p id="unitResult" class="text-2xl font-extrabold text-sky-400">6.2137 mi</p>
+      </div>
+    </section>
+
+    <footer class="text-center text-xs text-slate-500">
+      Tasas de cambio provistas por <a href="https://www.exchangerate-api.com" target="_blank" class="underline">Exchange Rate API</a>
+    </footer>
+  </div>
+
+  <script>
+    let ratesCache = {};
+
+    function showTab(name) {
+      ['moneda', 'porcentaje', 'ganancia', 'unidades'].forEach(t => {
+        document.getElementById('sec-' + t).classList.toggle('hidden', t !== name);
+        const btn = document.getElementById('tab-' + t);
+        btn.className = t === name
+          ? 'tab-btn bg-cyan-500 text-slate-950 font-bold py-2 rounded-lg text-sm'
+          : 'tab-btn text-slate-300 font-semibold py-2 rounded-lg text-sm';
+      });
+    }
+
+    async function convertCurrency() {
+      const amount = parseFloat(document.getElementById('amount').value) || 0;
+      const from = document.getElementById('fromCurr').value;
+      const to = document.getElementById('toCurr').value;
+      const resultEl = document.getElementById('currResult');
+      const infoEl = document.getElementById('currRateInfo');
+
+      try {
+        if (!ratesCache[from]) {
+          const res = await fetch(`https://open.er-api.com/v6/latest/${from}`);
+          const data = await res.json();
+          ratesCache[from] = data.rates;
+        }
+        const rate = ratesCache[from][to];
+        const total = (amount * rate).toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        resultEl.textContent = `${amount} ${from} = ${total} ${to}`;
+        infoEl.textContent = `Tasa actual: 1 ${from} = ${rate.toFixed(4)} ${to}`;
+      } catch (e) {
+        resultEl.textContent = "Error al obtener la tasa";
+      }
+    }
+
+    function calcPct() {
+      const p = parseFloat(document.getElementById('pctValue').value) || 0;
+      const t = parseFloat(document.getElementById('pctTotal').value) || 0;
+      document.getElementById('pctResult').textContent = ((p / 100) * t).toLocaleString('es-DO', { maximumFractionDigits: 4 });
+    }
+
+    function calcMargin() {
+      const base = parseFloat(document.getElementById('basePrice').value) || 0;
+      const pct = parseFloat(document.getElementById('marginPct').value) || 0;
+      const diff = base * (pct / 100);
+      document.getElementById('discountOut').textContent = (base - diff).toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('profitOut').textContent = (base + diff).toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function convertUnit() {
+      const v = parseFloat(document.getElementById('unitVal').value) || 0;
+      const mode = document.getElementById('unitMode').value;
+      let out = "";
+
+      if (mode === "km_mi") out = `${(v * 0.621371).toFixed(4)} mi`;
+      if (mode === "mi_km") out = `${(v / 0.621371).toFixed(4)} km`;
+      if (mode === "kg_lb") out = `${(v * 2.20462).toFixed(4)} lb`;
+      if (mode === "lb_kg") out = `${(v / 2.20462).toFixed(4)} kg`;
+      if (mode === "c_f") out = `${((v * 9) / 5 + 32).toFixed(2)} °F`;
+      if (mode === "f_c") out = `${(((v - 32) * 5) / 9).toFixed(2)} °C`;
+
+      document.getElementById('unitResult').textContent = out;
+    }
+
+    convertCurrency();
+    convertUnit();
+  </script>
+</body>
+  </html>
